@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Admin | Q Club Billiards{% endblock %}
+{% block meta_description %}Admin dashboard for reviewing and updating pool table booking statuses.{% endblock %}
+
+{% block content %}
+  <section class="page-hero" aria-labelledby="admin-heading">
+    <p class="eyebrow">Admin</p>
+    <h1 id="admin-heading">Booking dashboard</h1>
+    <p>View every pool table reservation submitted through the website.</p>
+  </section>
+
+  <section class="section admin-summary" aria-label="Booking summary">
+    <article>
+      <span>Total tables</span>
+      <strong>{{ tables|length }}</strong>
+    </article>
+    <article>
+      <span>Total bookings</span>
+      <strong>{{ bookings|length }}</strong>
+    </article>
+    <article>
+      <span>Estimated revenue</span>
+      <strong>${{ "%.2f"|format(total_revenue) }}</strong>
+    </article>
+  </section>
+
+  <section class="section" aria-labelledby="users-heading">
+    <div class="section-heading">
+      <p class="eyebrow">Accounts</p>
+      <h2 id="users-heading">All users</h2>
+    </div>
+
+    <div class="admin-table-wrapper">
+      <table class="admin-table">
+        <caption>Registered users</caption>
+        <thead>
+          <tr>
+            <th scope="col">User</th>
+            <th scope="col">Email</th>
+            <th scope="col">Phone</th>
+            <th scope="col">Role</th>
+            <th scope="col">Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+            <tr>
+              <th scope="row">{{ user.full_name }}</th>
+              <td>{{ user.email }}</td>
+              <td>{{ user.phone or '-' }}</td>
+              <td>
+                <form class="status-form" action="{{ url_for('update_user_role', user_id=user.id) }}" method="post">
+                  <select name="role" aria-label="Role for {{ user.full_name }}">
+                    <option value="player" {% if user.role == 'player' %}selected{% endif %}>Player</option>
+                    <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+                  </select>
+                  <button type="submit">Update</button>
+                </form>
+              </td>
+              <td>{{ user.created_at }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="tables-admin-heading">
+    <div class="section-heading">
+      <p class="eyebrow">Tables</p>
+      <h2 id="tables-admin-heading">All tables</h2>
+    </div>
+
+    <div class="admin-table-wrapper">
+      <table class="admin-table">
+        <caption>Billiard table inventory</caption>
+        <thead>
+          <tr>
+            <th scope="col">Table</th>
+            <th scope="col">Type</th>
+            <th scope="col">Hourly rate</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for table in tables %}
+            <tr>
+              <th scope="row">{{ table.name }}</th>
+              <td>{{ table.type }}</td>
+              <td>${{ "%.2f"|format(table.hourly_rate) }}/hr</td>
+              <td>
+                <form class="status-form" action="{{ url_for('update_table_status', table_id=table.id) }}" method="post">
+                  <select name="status" aria-label="Status for {{ table.name }}">
+                    <option value="available" {% if table.status == 'available' %}selected{% endif %}>Available</option>
+                    <option value="maintenance" {% if table.status == 'maintenance' %}selected{% endif %}>Maintenance</option>
+                    <option value="retired" {% if table.status == 'retired' %}selected{% endif %}>Retired</option>
+                  </select>
+                  <button type="submit">Update</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="all-bookings-heading">
+    <div class="section-heading">
+      <p class="eyebrow">Reservations</p>
+      <h2 id="all-bookings-heading">All bookings</h2>
+    </div>
+
+    {% if bookings %}
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <caption>All pool table bookings</caption>
+          <thead>
+            <tr>
+              <th scope="col">Reference</th>
+              <th scope="col">Account</th>
+              <th scope="col">Full name</th>
+              <th scope="col">Email</th>
+              <th scope="col">Phone number</th>
+              <th scope="col">Booking date</th>
+              <th scope="col">Booking time</th>
+              <th scope="col">Table type</th>
+              <th scope="col">Assigned table</th>
+              <th scope="col">Duration</th>
+              <th scope="col">Total</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for booking in bookings %}
+              <tr>
+                <th scope="row">#{{ booking.id }}</th>
+                <td>{{ booking.account_name or 'Guest legacy booking' }}</td>
+                <td>{{ booking.customer_name }}</td>
+                <td>{{ booking.email }}</td>
+                <td>{{ booking.phone }}</td>
+                <td>{{ booking.booking_date }}</td>
+                <td>{{ booking.start_time }}</td>
+                <td>{{ booking.table_type }}</td>
+                <td>{{ booking.table_name }}</td>
+                <td>{{ booking.duration|format_duration }}</td>
+                <td>${{ "%.2f"|format(booking.duration * booking.hourly_rate) }}</td>
+                <td>
+                  <form class="status-form" action="{{ url_for('update_booking_status', booking_id=booking.id) }}" method="post">
+                    <select name="status" aria-label="Booking status for #{{ booking.id }}">
+                      {% for status in booking_statuses %}
+                        <option value="{{ status }}" {% if booking.status == status %}selected{% endif %}>{{ status }}</option>
+                      {% endfor %}
+                    </select>
+                    <button type="submit">Update</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="empty-state">No bookings have been created yet.</p>
+    {% endif %}
+  </section>
+{% endblock %}

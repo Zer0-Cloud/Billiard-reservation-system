@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Register | Q Club Billiards{% endblock %}
+{% block meta_description %}Create a player account for Q Club Billiards table bookings.{% endblock %}
+
+{% block content %}
+  <section class="page-hero" aria-labelledby="register-heading">
+    <p class="eyebrow">Player account</p>
+    <h1 id="register-heading">Register</h1>
+    <p>Create an account to book tables and manage your own reservations.</p>
+  </section>
+
+  <section class="section auth-layout">
+    <form class="booking-form auth-form" action="{{ url_for('register') }}" method="post">
+      <label>
+        Full name
+        <input type="text" name="full_name" autocomplete="name" required>
+      </label>
+
+      <label>
+        Email address
+        <input type="email" name="email" autocomplete="email" required>
+      </label>
+
+      <label>
+        Phone number
+        <input type="tel" name="phone" autocomplete="tel" required>
+      </label>
+
+      <label>
+        Password
+        <input type="password" name="password" autocomplete="new-password" required>
+      </label>
+
+      <button type="submit">Create account</button>
+      <p class="form-note">Already registered? <a href="{{ url_for('login') }}">Log in</a>.</p>
+    </form>
+  </section>
+{% endblock %}

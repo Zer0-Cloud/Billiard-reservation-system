@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Booking Confirmation | Q Club Billiards{% endblock %}
+
+{% block content %}
+  <section class="page-hero confirmation-hero">
+    <p class="eyebrow">Confirmed</p>
+    <h1>Your table is booked.</h1>
+    <p>Thank you, {{ booking.customer_name }}. Your reservation details are below.</p>
+  </section>
+
+  <section class="section">
+    <div class="confirmation-panel">
+      <div>
+        <span>Booking reference</span>
+        <strong>#{{ booking.id }}</strong>
+      </div>
+      <div>
+        <span>Table</span>
+        <strong>{{ booking.table_name }} - {{ booking.table_type }}</strong>
+      </div>
+      <div>
+        <span>Date and time</span>
+        <strong>{{ booking.booking_date }} at {{ booking.start_time }}</strong>
+      </div>
+      <div>
+        <span>Duration</span>
+        <strong>{{ booking.duration|format_duration }}</strong>
+      </div>
+      <div>
+        <span>Estimated total</span>
+        <strong>${{ "%.2f"|format(total_price) }}</strong>
+      </div>
+      <div>
+        <span>Contact</span>
+        <strong>{{ booking.email }} - {{ booking.phone }}</strong>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <a class="primary-link" href="{{ url_for('booking') }}">Book another table</a>
+      <a class="secondary-link" href="{{ url_for('index') }}">Return home</a>
+    </div>
+  </section>
+{% endblock %}

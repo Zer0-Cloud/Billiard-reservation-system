@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Book a Table | Q Club Billiards{% endblock %}
+{% block meta_description %}Complete the pool table booking form with your contact details, table type, date, time, and duration.{% endblock %}
+
+{% block content %}
+  <section class="page-hero" aria-labelledby="booking-heading">
+    <p class="eyebrow">Reservations</p>
+    <h1 id="booking-heading">Book a pool table</h1>
+    <p>Choose your preferred table and playing time. We will hold the table for your arrival.</p>
+  </section>
+
+  <section class="section booking-layout" aria-labelledby="booking-form-heading">
+    <div class="section-heading">
+      <p class="eyebrow">Booking details</p>
+      <h2 id="booking-form-heading">Create a reservation</h2>
+    </div>
+
+    <form class="booking-form" action="{{ url_for('create_booking') }}" method="post">
+      <section class="account-note" aria-label="Booking account">
+        <h3>Booking as {{ g.user.full_name }}</h3>
+        <p>{{ g.user.email }}{% if g.user.phone %} - {{ g.user.phone }}{% endif %}</p>
+      </section>
+
+      <fieldset>
+        <legend>Contact information</legend>
+        <label>
+          Full name
+          <input type="text" value="{{ g.user.full_name }}" autocomplete="name" disabled>
+        </label>
+
+        <label>
+          Email address
+          <input type="email" value="{{ g.user.email }}" autocomplete="email" disabled>
+        </label>
+
+        <label>
+          Phone number
+          <input type="tel" name="phone" value="{{ g.user.phone or '' }}" autocomplete="tel" {% if not g.user.phone %}required{% else %}readonly{% endif %}>
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Reservation details</legend>
+        <label>
+          Table type
+          <select name="table_type" required>
+            <option value="">Choose a table type</option>
+            {% for table_type in table_types %}
+              <option value="{{ table_type.type }}">{{ table_type.type }} - from ${{ "%.2f"|format(table_type.hourly_rate) }}/hr - {{ table_type.table_count }} available</option>
+            {% endfor %}
+          </select>
+        </label>
+
+        <label>
+          Booking date
+          <input type="date" name="booking_date" id="booking-date" required>
+        </label>
+
+        <label>
+          Booking time
+          <select name="start_time" id="booking-time" required>
+            <option value="">Choose a time</option>
+            {% for value, label in booking_times %}
+              <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+
+        <label>
+          Duration
+          <select name="duration" id="booking-duration" required>
+            {% for duration in durations %}
+              <option value="{{ duration }}" data-minutes="{{ (duration * 60)|int }}">{{ duration|format_duration }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      </fieldset>
+
+      <button type="submit">Confirm booking</button>
+    </form>
+  </section>
+{% endblock %}

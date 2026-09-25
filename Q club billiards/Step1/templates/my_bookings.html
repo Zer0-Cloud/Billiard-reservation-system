@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}My Bookings | Q Club Billiards{% endblock %}
+{% block meta_description %}View and cancel your own Q Club Billiards table bookings.{% endblock %}
+
+{% block content %}
+  <section class="page-hero" aria-labelledby="my-bookings-heading">
+    <p class="eyebrow">Player bookings</p>
+    <h1 id="my-bookings-heading">My bookings</h1>
+    <p>Review your reservations and cancel any booking you no longer need.</p>
+  </section>
+
+  <section class="section" aria-labelledby="my-bookings-table-heading">
+    <div class="section-heading">
+      <p class="eyebrow">Reservations</p>
+      <h2 id="my-bookings-table-heading">Your bookings</h2>
+    </div>
+
+    {% if bookings %}
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <caption>Your pool table bookings</caption>
+          <thead>
+            <tr>
+              <th scope="col">Reference</th>
+              <th scope="col">Date</th>
+              <th scope="col">Time</th>
+              <th scope="col">Table type</th>
+              <th scope="col">Assigned table</th>
+              <th scope="col">Duration</th>
+              <th scope="col">Total</th>
+              <th scope="col">Status</th>
+              <th scope="col">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for booking in bookings %}
+              <tr>
+                <th scope="row">#{{ booking.id }}</th>
+                <td>{{ booking.booking_date }}</td>
+                <td>{{ booking.start_time }}</td>
+                <td>{{ booking.table_type }}</td>
+                <td>{{ booking.table_name }}</td>
+                <td>{{ booking.duration|format_duration }}</td>
+                <td>${{ "%.2f"|format(booking.duration * booking.hourly_rate) }}</td>
+                <td>{{ booking.status }}</td>
+                <td>
+                  {% if booking.status != 'Cancelled' %}
+                    <form class="status-form" action="{{ url_for('cancel_my_booking', booking_id=booking.id) }}" method="post">
+                      <button type="submit">Cancel</button>
+                    </form>
+                  {% else %}
+                    <span>Cancelled</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="empty-state">You do not have any bookings yet.</p>
+    {% endif %}
+  </section>
+{% endblock %}

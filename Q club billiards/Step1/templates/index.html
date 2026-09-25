@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Q Club Billiards | Pool Table Booking{% endblock %}
+{% block meta_description %}Reserve American 9-ball and Chinese 8-ball tables online at Q Club Billiards in Adelaide.{% endblock %}
+
+{% block content %}
+  <section class="hero" aria-labelledby="home-heading">
+    <div class="hero-copy">
+      <p class="eyebrow">Online table reservations</p>
+      <h1 id="home-heading">Book your next pool session.</h1>
+      <p>Reserve American 9-ball and Chinese 8-ball tables before you arrive.</p>
+      <a class="primary-link" href="{{ url_for('booking') }}">Reserve now</a>
+    </div>
+  </section>
+
+  <section id="tables" class="section" aria-labelledby="tables-heading">
+    <div class="section-heading">
+      <p class="eyebrow">Tables</p>
+      <h2 id="tables-heading">Available options</h2>
+    </div>
+
+    <div class="table-grid">
+      {% for table in tables %}
+        <article class="table-card">
+          <div>
+            <h3>{{ table.name }}</h3>
+            <p>{{ table.type }}</p>
+          </div>
+          <div class="table-meta">
+            <span>${{ "%.2f"|format(table.hourly_rate) }}/hr</span>
+            <span>{{ table.status|title }}</span>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="section venue-band" aria-labelledby="venue-heading">
+    <div class="venue-layout">
+      <div>
+        <div class="section-heading">
+          <p class="eyebrow">Visit us</p>
+          <h2 id="venue-heading">Clean tables, focused lighting, and room to play.</h2>
+        </div>
+
+        <address class="venue-address">
+          <strong>Q Club Billiard</strong>
+          <span>17-19 Wright St, Adelaide SA 5000</span>
+        </address>
+
+        <dl class="venue-details">
+          <div>
+            <dt>Hours</dt>
+            <dd>Open daily from 2:00 PM to 12:30 AM</dd>
+          </div>
+          <div>
+            <dt>Tables</dt>
+            <dd>American 9-ball, regular Chinese 8-ball, premium Chinese 8-ball, and Joy Gold Leg Chinese 8-ball.</dd>
+          </div>
+        </dl>
+
+        <a class="primary-link" href="https://maps.app.goo.gl/jA7a3EDBsxJT75Mi8?g_st=ic" target="_blank" rel="noopener">Get directions</a>
+      </div>
+
+      <div class="venue-gallery" aria-label="Venue photos">
+        <img src="{{ url_for('static', filename='images/location-map.jpg') }}" alt="Map location for Q Club Billiard on Wright Street">
+        <img src="{{ url_for('static', filename='images/venue-interior.jpg') }}" alt="Q Club Billiard interior with multiple tables">
+        <img src="{{ url_for('static', filename='images/chinese-8-ball-table.jpg') }}" alt="Chinese 8-ball table with cues">
+      </div>
+    </div>
+  </section>
+
+  <section id="schedule" class="section" aria-labelledby="schedule-heading">
+    <div class="section-heading">
+      <p class="eyebrow">Schedule</p>
+      <h2 id="schedule-heading">Upcoming bookings</h2>
+    </div>
+
+    {% if bookings %}
+      <div class="booking-list">
+        {% for booking in bookings %}
+          <article class="booking-item">
+            <strong>{{ booking.table_name }}</strong>
+            <span>{{ booking.booking_date }} at {{ booking.start_time }}</span>
+            <span>{{ booking.duration|format_duration }}</span>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="empty-state">No bookings yet.</p>
+    {% endif %}
+  </section>
+{% endblock %}
